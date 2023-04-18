@@ -1,27 +1,99 @@
-# Web3test
+## create moralis service to use
+`> ng g s moralis-service` this will **g**enerate a **s**ervice of the type **moralis-service** obviously.
+this generates two moralis service files in our `/app`
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.6.
+next, we need to import the `HttpClientModule` in `app.module.ts` so we can make requests later
 
-## Development server
+next, install Metamask interface provider - we need it so typescript can have type definitions
+`> npm i @metamask/providers`
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+then add the following imports to our `moralis-service.service.ts`:
+```
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { environment } from 'src/environments/environment';
+```
 
-## Code scaffolding
+```
+declare global {
+  interface Window {
+    ethereum: MetaMaskInpageProvider;
+  }
+}
+```
+the above global interface tells our Winow that "ethereum" is of type MetaMaskInpageProvider
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+then define ResponseTypes which will handle requests/responses to the Moralis service:
+```
+export interface ResponseType {
+    total: number,
+    page: number,
+    page_size: number,
+    cursor?: null,
+    result: Array<any>,
+    balance: number
+}
+```
 
-## Build
+Now in the service class:
+```
+  api = environment.Moralis_api;
+  chain: any;
+  walletAddress: any;
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+the `environment.ts` file that we are getting our `Moralis_api` variable from is a config file that we use for switching between testing and production etc.  *The purpose of this is so we can put our API key in the file without sharing it later*
 
-## Running unit tests
+add `private http:HttpClient` as a parameter for our service's constructor
+`constructor(private http:HttpClient) {`
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+next, create the `loginMetaMask()` function:
+```
+async loginMetaMask() {
+	const ethereum = window.ethereum as MetaMaskInpageProvider;
+	const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+	sessionStorage.setItem('data', accounts[0]);
+	return accounts[0];
+}
+```
 
-## Running end-to-end tests
+the compiler wouldn't know what ethereum in `ethereum.request` is if we don't make that global interface.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+`sessionStorage` creates a browser session.
 
-## Further help
+Create the `getWalletAddress()` function which assigns the `walletAddress` var we created above:
+```
+getWalletAddress() {
+	this.walletAddress = sessionStorage.getItem('data');
+	return this.walletAddress;
+}
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```
+getnftData() {
+	return this.http.get<ResponseType>(
+		`https://deep-index.moralis.io/api/v2/${this?.walletAddress}/nft`,
+		{headers:new HttpHeaders({}), params:new HttpParams().set('chain', `${this?.chain`}')}
+	);
+}
+```
+
+---
+# Restart.  use Moralis docs
+`> npm install axios` - to make requests to the moralis server.  can also use Angular's HTTP module as bove.
+
+`> ng g c balances` make a new balances component for displaying balances.
+
+now in `app-routing.module.ts`
+```
+import { BalancesComponent } from "./balances/balances.component";
+
+const routes: Routes = [{ path: "balances", component: BalancesComponent }];
+```
+
+fill in `balances.component.html` with the boilerplat that shows address, nativeBalance, tokenBalances variables.
+Then go to the component typescript file
+
+
+
+#moralis #web3 #angular #webdev #javascript
