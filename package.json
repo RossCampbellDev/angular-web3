@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "web3serve": "npm run ./src/app/index.js"
   },
   "private": true,
   "dependencies": {
@@ -18,6 +19,10 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
+    "@moralisweb3/common-evm-utils": "^2.18.4",
+    "axios": "^1.3.6",
+    "express": "^4.18.2",
+    "moralis": "^2.18.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
