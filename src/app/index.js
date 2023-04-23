@@ -31,7 +31,6 @@ const startServer = async () => {
     });
   };
 
-
 async function runContractFunction(_functionName, _params) {
     const response = await Moralis.EvmApi.utils.runContractFunction({
         chain: chain,

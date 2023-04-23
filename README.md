@@ -9,7 +9,6 @@ this front end consumes the above service to display the web3 information we req
 
 ## MetaMask compatibility
 `> npm install @wagmi/core@0.5.8 ethers axios`
-
 `> ng generate component signin`
 `> ng generate component user`
 
