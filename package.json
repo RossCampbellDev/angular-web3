@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "web3serve": "npm run ./src/app/index.js"
+    "web3serve": "node ./src/app/index.js"
   },
   "private": true,
   "dependencies": {
@@ -22,8 +22,11 @@
     "@moralisweb3/common-evm-utils": "^2.18.4",
     "@wagmi/core": "^0.5.8",
     "axios": "^1.3.6",
-    "ethers": "^6.3.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.4.2",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "moralis": "^2.18.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

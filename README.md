@@ -15,3 +15,15 @@ this front end consumes the above service to display the web3 information we req
 add the environments file that specifies our localhost testing environment
 
 open our routing module and add the two new components
+
+in our signin component, add a button that calls a "handleAuth" function.  (async, of course)
+then go to the user component:
+
+### now modify our "server" in index.js
+`> npm install cookie-parser jsonwebtoken dotenv`
+
+make an env file to hold our app's domain, our moralis api key, our angular URL, and our authentication secret
+
+go to our user component and start adding routes to handle verification and creation of messages with Moralis, logout, and authentication.
+
+then complete the signin component to integrate it with our server.  for this we use axios router and getDefaultProvider from Ethers.

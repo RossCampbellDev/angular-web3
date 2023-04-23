@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import axios from 'axios';
+import { environment } from '../../../src/environments';
 
 @Component({
   selector: 'app-user',
@@ -6,5 +9,31 @@ import { Component } from '@angular/core';
   styleUrls: ['./user.component.css']
 })
 export class UserComponent {
+  constructor(private router: Router) { }
+  session = '';
 
+  async ngOnInit() {
+    try {
+      const { data } = await axios.get(
+        `${environment.SERVER_URL}/authenticate`,
+        {
+          withCredentials: true,
+        }
+      );
+  
+      const { iat, ...authData } = data; // remove unimportant iat value
+  
+      this.session = JSON.stringify(authData, null, 2); // format to be displayed nicely
+    } catch (err) {
+      // if user does not have a "session" token, redirect to /signin
+      this.router.navigateByUrl('/signin');
+    }
+  }
+  
+  async signOut() {
+    await axios.get(`${environment.SERVER_URL}/logout`, {
+      withCredentials: true,
+    });
+    this.router.navigateByUrl('/signin');
+  }
 }

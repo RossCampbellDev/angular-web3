@@ -1,4 +1,5 @@
 const Moralis = require("moralis").default;
+require('dotenv').config();
 
 const express = require("express");
 const cors = require("cors");
@@ -142,6 +143,85 @@ async function getDemoData() {
   // Add tokens to the output
   return { native, tokens };
 }
+
+
+// ----------------------------------------
+//  new metamask authentication parts
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+
+const config = {
+    domain: process.env.APP_DOMAIN,
+    statement: 'Please sign this to confirm',
+    uri: process.env.ANGULAR_URL,
+    timeout: 60,
+}
+
+// an endpoint that will make requests to Moralis.Auth
+//  which will generate a unique message.  this is then used in the next endpoint
+app.post('/request-message', async (req, res) => {
+   const { address, chain, network } = req.body;
+   
+   try {
+        const message = await Moralis.Auth.requestMessage({
+            address, chain, network, ...config,
+        });
+        res.status(200).json(message);
+   } catch (error) {
+        res.status(400).json({ error: error.message });
+        console.error(error);
+   }
+});
+
+app.post('/verify', async (req, res) => {
+    try {
+        const { message, signature } = req.body;
+
+        const { address, profileId } = (
+            await Moralis.Auth.verifyMessage({
+                message, signature, networkType: 'evm',
+            })
+        ).raw;
+
+        const user = { address, profileId, signature };
+
+        const token = jwt.sign(user, process.env.AUTH_SECRET);
+
+        res.cookie('jwt', token, {
+            httpOnly: true,
+        });
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+        console.error(error);
+    }
+})
+
+app.get('/authenticate', async (req, res) => {
+    const token = req.cookies.jwt;
+    if (!token) return res.sendStatus(403); // if the user did not send a jwt token, they are unauthorized
+  
+    try {
+      const data = jwt.verify(token, process.env.AUTH_SECRET);
+      res.json(data);
+    } catch {
+      return res.sendStatus(403);
+    }
+});
+
+app.get('/logout', async (req, res) => {
+    try {
+      res.clearCookie('jwt');
+      return res.sendStatus(200);
+    } catch {
+      return res.sendStatus(403);
+    }
+});
+
+
+
+
 
 
 startServer();

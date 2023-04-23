@@ -1,1 +1,6 @@
-<p>user works!</p>
+<h1>User Component</h1>>
+<div *ngIf="session">
+    <h3>User session:</h3>
+    <pre>{{ session }}</pre>
+    <button type="button" (click)="signOut()">Sign out</button>
+</div>
